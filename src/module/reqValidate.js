@@ -30,6 +30,9 @@ const schema = {
         },
         "siteKey": {
             "type": "string"
+        },
+        "referer": {
+            "type": "string"
         }
     },
     "required": ["mode", "url"],

@@ -1,4 +1,4 @@
-function getSource({ url, proxy }) {
+function getSource({ url, proxy,referer }) {
   return new Promise(async (resolve, reject) => {
     if (!url) return reject("Missing url parameter");
     const context = await global.browser
@@ -27,7 +27,13 @@ function getSource({ url, proxy }) {
         });
 
       await page.setRequestInterception(true);
-      page.on("request", async (request) => request.continue());
+      // add referer to the request
+      page.on("request", async (request) => {
+        if (request.resourceType() === "document") {
+          request.headers()["Referer"] = referer;
+        }
+        request.continue();
+      });
       page.on("response", async (res) => {
         try {
           if (
@@ -38,10 +44,11 @@ function getSource({ url, proxy }) {
               .waitForNavigation({ waitUntil: "load", timeout: 5000 })
               .catch(() => {});
             const html = await page.content();
+            let headers = await res.headers();
             await context.close();
             isResolved = true;
             clearInterval(cl);
-            resolve(html);
+            resolve({html, headers});
           }
         } catch (e) {}
       });

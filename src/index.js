@@ -47,7 +47,7 @@ app.post('/cf-clearance-scraper', async (req, res) => {
 
     switch (data.mode) {
         case "source":
-            result = await getSource(data).then(res => { return { source: res, code: 200 } }).catch(err => { return { code: 500, message: err.message } })
+            result = await getSource(data).then(res => { return { headers:res.headers, source: res.html, code: 200 } }).catch(err => { return { code: 500, message: err.message } })
             break;
         case "turnstile-min":
             result = await solveTurnstileMin(data).then(res => { return { token: res, code: 200 } }).catch(err => { return { code: 500, message: err.message } })
